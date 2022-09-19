@@ -1,0 +1,4 @@
+<div class="flex text-gray-400 p-3">
+    <a href="/" class="hover:text-gray-200 mx-2">Home</a>
+    <a href="/docs" class="hover:text-gray-200 mx-2">API Docs</a>
+</div>

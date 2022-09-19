@@ -1,0 +1,3 @@
+[default]
+secret_key = "some_key_here"
+template_dir = "templates"

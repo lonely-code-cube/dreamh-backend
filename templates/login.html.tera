@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "base" %}
+    <title>Document</title>
+</head>
+
+<body class="text-white">
+    {% include "nav" %}
+    <div class="content mt-16">
+        <div class="flex flex-col justify-center items-center">
+            <div class="border rounded-lg border-cyan-400 p-4 text-center w-4/5 md:w-1/2">
+                <div class="text-2xl">Admin Login</div>
+                <input id="username" type="text" placeholder="Username" class="my-5 p-2 w-[100%] rounded-lg text-black">
+                <input id="password" type="password" placeholder="Password" class="my-5 p-2 w-[100%] rounded-lg text-black">
+                <div id="message" class="text-red-400"></div>
+                <button onclick="login();" class="p-2 bg-cyan-600 hover:bg-cyan-700 my-5">Login</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    let message = '';
+    async function login() {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
+        let res = await fetch("/admin/login", {
+            method: 'POST',
+            body: JSON.stringify({
+                name: username,
+                password: password,
+            })
+        })
+        if (res.status === 200) {
+            window.location.href = "/admin";
+        } else {
+            message = 'Wrong credentials';
+            document.getElementById("message").innerHTML = message;
+            document.getElementById("username").value = '';
+            document.getElementById("password").value = '';
+        }
+    }
+</script>
+
+</html>

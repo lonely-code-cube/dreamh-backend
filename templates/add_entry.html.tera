@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "base" %}
+    <link rel="stylesheet" href="/static/vanillaSelectBox.css">
+    <title>Add Entry</title>
+</head>
+
+<body class="text-white">
+    {% include "nav" %}
+    <div class="content mt-16">
+        <div x-data="{ open: false }">
+            <button @click="open = !open" class="p-2 ml-[5%] mb-4 bg-cyan-600 hover:bg-cyan-700 rounded">Add
+                Entry</button>
+            <div x-show="open"
+                x-data="{ title: '', description: '',  thumbnail: '', ehentai: '', nhentai: '', imgur: '', source: ''}"
+                class="ml-[5%] mb-4 flex flex-col w-1/2">
+                <input type="text" x-model="title" placeholder="Title" class="p-2 m-1 text-black">
+                <input type="text" x-model="description" placeholder="Description" class="p-2 m-1 text-black">
+                <input type="text" x-model="thumbnail" placeholder="Thumbnail" class="p-2 m-1 text-black">
+                <input type="text" x-model="ehentai" placeholder="Ehentai" class="p-2 m-1 text-black">
+                <input type="text" x-model="nhentai" placeholder="Nhentai" class="p-2 m-1 text-black">
+                <input type="text" x-model="imgur" placeholder="Imgur" class="p-2 m-1 text-black">
+                <input type="text" x-model="source" placeholder="Source" class="p-2 m-1 text-black">
+                <select id="tags" multiple size="10" class="p-2">
+                    {% for tag in tags %}
+                    <option value="{{ tag.id }}">{{ tag.name }}</option>
+                    {% endfor %}
+                </select>
+                <select id="tier" size="7" class="p-2">
+                    <option value="S">S</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                    <option value="F">F</option>
+                </select>
+                <select id="pair" class="p-2">
+                    <option value="FM">FM</option>
+                    <option value="FF">FF</option>
+                    <option value="MM">MM</option>
+                </select>
+                <select id="authors" size="10" class="p-2">
+                    {% for author in authors %}
+                    <option value="{{ author.id }}">{{ author.name }}({{ author.id }})</option>
+                    {% endfor %}
+                </select>
+                <button id="add-page" class="p-2 m-2 bg-cyan-500">Add Page</button>
+                <button id="remove-page" class="p-2 m-2 bg-red-500">Remove page</button>
+                <div id="pages" class="text-gray-500">
+                    <div id="TextBoxDiv1">
+                        <label>Textbox #1 : </label><input type='textbox' id='textbox1'>
+                    </div>
+                </div>
+                <button x-on:click="add_author(name, source)"
+                    class="bg-emerald-500 hover:bg-emerald-600 p-2 m-1 w-[20%] rounded">Save</button>
+                <button class="bg-red-500 hover:bg-red-600 p-2 m-1 w-[20%] rounded"
+                    x-on:click="open = false;">Cancel</button>
+            </div>
+        </div>
+        <table class="table-auto w-[90%] m-auto border border-gray-700 rounded">
+            <thead>
+                <tr>
+                    <th class="p-2">S no.</th>
+                    <th class="p-2">Id</th>
+                    <th class="p-2">Title</th>
+                    <th class="p-2">Pair</th>
+                    <th class="p-2">Tier</th>
+                    <th class="p-2">Source</th>
+                    <th class="p-2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr class="border-t border-gray-600 text-center">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ entry.id }}</td>
+                    <td>{{ entry.title }}</td>
+                    <td>{{ entry.pair }}</td>
+                    <td>{{ entry.tier }}</td>
+                    <td><a class="text-cyan-500 hover:underline hover:underline-offset-1" href="{{ entry.source }}">{{
+                            entry.source }}</a></td>
+                    <td><button class="text-red-400" onclick="delete_tag('{{ entry.id }}');"><i
+                                class="fa-solid fa-trash"></i></button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script src="/static/vanillaSelectBox.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"
+    integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+
+<script>
+    let tagSelect = new vanillaSelectBox('#tags');
+    let authorSelect = new vanillaSelectBox('#authors');
+    let tierSelect = new vanillaSelectBox('#tier');
+    let pairSelect = new vanillaSelectBox('#pair');
+
+    /* let tags = {
+        {% for tag in tags %}
+        {{ tag.id }}: {{ tag.name }},
+        {% endfor %}
+    }; */
+
+    var counter = 2;
+
+    $("#add-page").click(function () {
+
+        var newTextBoxDiv = $(document.createElement('div'))
+            .attr("id", 'TextBoxDiv' + counter);
+
+        newTextBoxDiv.after().html('<label>Textbox #' + counter + ' : </label>' +
+            '<input type="text" name="textbox' + counter +
+            '" id="textbox' + counter + '" value="" >');
+
+        newTextBoxDiv.appendTo("#pages");
+
+
+        counter++;
+    });
+
+    $("#remove-page").click(function () {
+        if (counter == 2) {
+            alert("No more textbox to remove");
+            return false;
+        }
+
+        counter--;
+
+        $("#TextBoxDiv" + counter).remove();
+
+    });
+
+    async function add_entry(name, source) {
+        let res = await fetch("/admin/add/author", {
+            method: "POST",
+            body: JSON.stringify({
+                name: name,
+                source: source,
+            })
+        })
+        if (res.status === 201) {
+            location.reload()
+        }
+    }
+</script>
+
+</html>

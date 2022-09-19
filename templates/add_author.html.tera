@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "base" %}
+    <title>Add Author</title>
+</head>
+
+<body class="text-white">
+    {% include "nav" %}
+    <div class="content mt-16">
+        <div x-data="{ open: false }">
+            <button @click="open = !open" class="p-2 ml-[5%] mb-4 bg-cyan-600 hover:bg-cyan-700 rounded">Add
+                Author</button>
+            <div x-show="open" x-data="{ name: '', source: '' }" class="ml-[5%] mb-4">
+                <input type="text" x-model="name" placeholder="Name of Author..." class="p-2 text-black">
+                <input type="text" x-model="source" placeholder="Source..." class="p-2 text-black">
+                <button x-on:click="add_author(name, source)"
+                    class="bg-emerald-500 hover:bg-emerald-600 p-2 rounded">Save</button>
+                <button class="bg-red-500 hover:bg-red-600 p-2 rounded"
+                    x-on:click="name = ''; open = false;">Cancel</button>
+            </div>
+        </div>
+        <table class="table-auto w-[90%] m-auto border border-gray-700 rounded">
+            <thead>
+                <tr>
+                    <th class="p-2">S no.</th>
+                    <th class="p-2">Id</th>
+                    <th class="p-2">Name</th>
+                    <th class="p-2">Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for author in authors %}
+                <tr class="border-t border-gray-600 text-center">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ author.id }}</td>
+                    <td>{{ author.name }}</td>
+                    <td><a class="text-cyan-500 hover:underline hover:underline-offset-1" href="{{ author.source }}">{{
+                            author.source }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script>
+    async function add_author(name, source) {
+        let res = await fetch("/admin/add/author", {
+            method: "POST",
+            body: JSON.stringify({
+                name: name,
+                source: source,
+            })
+        })
+        if (res.status === 201) {
+            location.reload()
+        }
+    }
+</script>
+
+</html>
