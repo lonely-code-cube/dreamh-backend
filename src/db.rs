@@ -2,8 +2,8 @@ use std::str::FromStr;
 
 use anyhow::{Context, Result};
 use futures::stream::TryStreamExt;
+use mongodb::bson::doc;
 use mongodb::bson::oid::ObjectId;
-use mongodb::bson::{doc};
 use mongodb::Client;
 
 use crate::models::models::{Author, Entry, Tag};
@@ -35,6 +35,16 @@ impl DB {
         Ok(tags)
     }
 
+    pub async fn tag(&self, id: String) -> Result<Option<Tag>> {
+        let tag = self
+            .conn
+            .database("data")
+            .collection::<Tag>("tags")
+            .find_one(doc! {"_id": id}, None)
+            .await?;
+        Ok(tag)
+    }
+
     pub async fn add_tag(&self, name: String) -> Result<Tag> {
         let x = self
             .conn
@@ -55,6 +65,15 @@ impl DB {
             },
             name: name,
         })
+    }
+
+    pub async fn update_tag(&self, id: String, name: String) -> Result<()> {
+        self.conn
+            .database("data")
+            .collection::<Tag>("tags")
+            .update_one(doc! {"_id": id}, doc! {"$set": {"name": name}}, None)
+            .await?;
+        Ok(())
     }
 
     pub async fn delete_tag(&self, id: String) -> Result<()> {
@@ -78,6 +97,16 @@ impl DB {
             authors.push(author);
         }
         Ok(authors)
+    }
+
+    pub async fn author(&self, id: String) -> Result<Option<Author>> {
+        let author = self
+            .conn
+            .database("data")
+            .collection::<Author>("authors")
+            .find_one(doc! {"_id": id}, None)
+            .await?;
+        Ok(author)
     }
 
     pub async fn add_author(&self, name: String, source: Option<String>) -> Result<Author> {

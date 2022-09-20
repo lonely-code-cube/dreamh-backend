@@ -4,15 +4,19 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Entry {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
-    pub id: Option<ObjectId>,
+    pub oid: Option<ObjectId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<u32>,
     pub title: String,
     pub description: Option<String>,
+    pub parody: Option<String>,
     pub author_name: String,
     pub author_id: ObjectId,
     pub thumbnail: String,
     pub pair: String,
     pub tier: String,
-    pub rating: u32,
+    pub rated_by: u32,
+    pub rating: f32,
     pub favorites: u32,
     pub tags: Vec<Tag>,
     pub pages: Vec<String>,

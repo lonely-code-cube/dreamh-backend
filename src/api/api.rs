@@ -18,15 +18,18 @@ pub struct ApiAuthor {
 
 #[derive(Serialize)]
 pub struct ApiEntry {
-    pub id: String,
+    pub oid: String,
+    pub id: u32,
     pub title: String,
     pub description: Option<String>,
+    pub parody: Option<String>,
     pub author_name: String,
     pub author_id: String,
     pub thumbnail: String,
     pub pair: String,
     pub tier: String,
-    pub rating: u32,
+    pub rating: f32,
+    pub rated_by: u32,
     pub favorites: u32,
     pub tags: Vec<ApiTag>,
     pub pages: Vec<String>,
@@ -76,15 +79,18 @@ pub async fn get_entries(db: &State<DB>) -> Json<Vec<ApiEntry>> {
         .unwrap()
         .iter()
         .map(|entry| ApiEntry {
-            id: entry.id.unwrap().to_string(),
+            oid: entry.oid.unwrap().to_string(),
+            id: entry.id.unwrap(),
             title: entry.title.to_owned(),
             description: entry.description.to_owned(),
+            parody: entry.parody.to_owned(),
             author_name: entry.author_name.to_owned(),
             author_id: entry.author_id.to_string(),
             thumbnail: entry.thumbnail.to_owned(),
             pair: entry.pair.to_owned(),
             tier: entry.tier.to_owned(),
             rating: entry.rating,
+            rated_by: entry.rated_by,
             favorites: entry.favorites,
             tags: entry
                 .tags
