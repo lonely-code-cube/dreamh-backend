@@ -185,7 +185,7 @@ pub async fn add_entry(_admin: Admin, db: &State<DB>) -> Template {
         pub benzene: bool,
     }
     let entries = db
-        .entries()
+        .entries(Some(100), Some(0))
         .await
         .unwrap()
         .iter()
